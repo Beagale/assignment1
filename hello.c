@@ -1,10 +1,10 @@
 //Referenced code from Quick Start Guide section (5.2)
-
-#include <stdio.h>
+//TEST
+#include <stdio.h
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
-
+ 
 #define trigger_file_name "/sys/class/leds/beaglebone:green:usr0/trigger"
 #define trigger_file_name1 "/sys/class/leds/beaglebone:green:usr1/trigger"
 
