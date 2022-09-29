@@ -216,17 +216,17 @@ int main()
         printf("When LED3 lights up, press the USER button!\n");
         sleepForMs(2000); //wait for 2ms
 
-        int response_time = 0;
+        long long response_time = 0;
         //Check if user is already pressing the USER button
         //Code taken from GPIO Guide
         int user_value_after_wait = readFromFileToScreen("/sys/class/gpio/gpio72/value");
         if (user_value_after_wait == 0){
             //If user has not pressed the USER button after 5 seconds, display response time and exit game
             response_time = 5000;
-            printf("Your response time is: %i ms\n",response_time);
-            play_game = 0;
+            //printf("Your response time is: %i ms\n",response_time);
+            //play_game = 0;
         }
-        else{
+       // else{
             //Light up LED3
             //Set the brightness of LED 3 to ON
             //Code to set brightness taken from LED Guide
@@ -247,6 +247,7 @@ int main()
             long long current_time = 0;
             long long time_difference = 0;
             long long temp_best_time = 0;
+            //long long temp_best_time_5000 = 0;
 
             int user_value_after_led3 = 1;
             bool user_pressed_after_led3 = false;
@@ -285,22 +286,40 @@ int main()
                         exit(1);
                     }
                     fclose(pLedBrightnessFile2);
+
+                    
+
                     //Check if current response time is the best response time so far
+                   // temp_best_time_5000 = temp_best_time;
                     temp_best_time = time_difference;
+                   
                     if (temp_best_time > best_time && best_time == 0)
                     {
                         best_time = temp_best_time;
                         printf("New best time!\n");
                     }
-                    else if (temp_best_time < best_time){
+                    else if (temp_best_time < best_time && temp_best_time != 0){
                         best_time = temp_best_time;
                     }
 
-                    //Print out reaction time and best time
-                    printf("Your reaction time was: %lli ms\n",time_difference);
-                    printf("Best time so far in game is: %lli ms\n",best_time);
-                    printf("Press the USER button to play again!\n");
+                   if (response_time == 5000)  {
+                    //TEST
+                    //printf("entered response time if statement\n\ntemp_best_time = %lli",temp_best_time_5000);
 
+                        //best_time = temp_best_time_5000;
+                        printf("Your reaction time was: %lli ms\n",response_time);
+                        printf("Best time so far in game is: %lli ms\n",best_time);
+                        printf("Press the USER button to play again!\n");
+                   
+                    }
+                    else{ 
+
+                        //Print out reaction time and best time
+                        printf("Your reaction time was: %lli ms\n",time_difference);
+                        printf("Best time so far in game is: %lli ms\n",best_time);
+                        printf("Press the USER button to play again!\n");
+                    }
+                    
                     user_pressed_after_led3 = true; //exit while loop once user has pressed USER button
                     user_pressed_start = false;
                     sleepForMs(1000);
@@ -315,7 +334,7 @@ int main()
             }
 
 
-        }
+//        }
 
         //Turn off all LEDS
         //Code to turn off LEDs taken from LED Guide
