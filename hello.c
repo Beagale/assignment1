@@ -14,14 +14,13 @@
 #define brightness_file_name1 "/sys/class/leds/beaglebone:green:usr1/brightness"
 #define brightness_file_name2 "/sys/class/leds/beaglebone:green:usr2/brightness"  
 #define brightness_file_name3 "/sys/class/leds/beaglebone:green:usr3/brightness" 
-//#define user_button 
 
 static long long getTimeInMs(void);
 static void sleepForMs(long long);
 int readFromFileToScreen(char *); 
 static void runCommand(char *);
 
-//Code taken from Assignment 1 PDF (page 5 and 6)
+//Functions shown below before main() are taken/referenced from Assignment 1 PDF (unless indicated)
 //Retrieve the current time
 static long long getTimeInMs(void)
 {
@@ -84,19 +83,16 @@ int readFromFileToScreen(char *fileName)
     
     //line below helps to check what value is read
     //printf("Read: '%s'\n", buff);
-   // return buff;
 
-    
-    //sscanf(buff, "%i", &i); //convert buff into an int 
+    //For assignment1, I used readFromFileToScreen() to read gpio72 value file
+    //Thus, I converted buff (which would = the number written in the value file) into an int and returned the value
     int i = atoi(buff);
     if(i == 0)
     {
-      //  printf("i = %i\n",i);
-        return 0;
+        return 0; 
         
     }
     else {
-        //printf("i = %i\n",i);
         return 1;
     }
 
@@ -106,10 +102,10 @@ int readFromFileToScreen(char *fileName)
 int main()
 {
 
-    printf("Hello embedded world, from Abigail!\n");
+    printf("Hello embedded world, from Abigail!\nClick the USER button to start the game!\n");
 
     //Set all LEDs' triggers
-    //Code taken from LED Guide
+    //Code to set triggers is taken from LED Guide
     //Set trigger for LED0
     FILE *pLedTriggerFile = fopen(trigger_file_name,"w");
     if(pLedTriggerFile == NULL){
@@ -156,9 +152,8 @@ int main()
     }
 
     //Config USER button for gpio
+    //Code taken from GPIO guide
     runCommand("config-pin p8.43 gpio");
-
-    //Code taken from GPIO Guide
     //Writes to the USER button and makes it an input
     FILE *pFile = fopen("/sys/class/gpio/gpio72/direction", "w'");
     if(pFile == NULL){
@@ -170,40 +165,31 @@ int main()
     //CLose file using fclose();
     fclose(pFile); 
 
-    //Reads the USER button and checks if user has pressed button or not
-    int user_value_start = 1;
-    bool user_pressed_start = false;
-
-    //Declare best_time
+    int user_value_start = 1; //Set flag that states the current number in gpio72 value file
+    bool user_pressed_start = false; //Set flag that states that user has not pressed USER button
     long long best_time = 0;
 
     //NOTE: BEGIN THE LOOP HERE
     int play_game = 1;
     while(play_game == 1)
     {
-        //TEST
-        //user_pressed_start = false; originally uncommented
+
         while (user_pressed_start == false)
         {
-            
-            //TEST
-            //printf("user_value_start = %i\n", user_value_start);
-            user_value_start = readFromFileToScreen("/sys/class/gpio/gpio72/value");
-            //TEST
-            //printf("i = %i\n", user_value_start);
+        
+            user_value_start = readFromFileToScreen("/sys/class/gpio/gpio72/value"); //Read gpio72 value file to see if user has pressed button
             if(user_value_start == 0){
             
-                printf("By clicking the USER button, you have started the game!\nTurning on LED0...");
-                user_pressed_start = true; //exit while loop once user has pressed USER button
-                user_value_start = 1;
+                user_pressed_start = true; //Exit while loop once user has pressed USER button
+                user_value_start = 1; //Reset flag
             }
             else{
-              //  printf("I AM 1");
                 user_pressed_start = false;
             }
         }
 
         //Set the brightness of LED 0 to ON
+        //Code to set brightness taken from LED Guide
         FILE *pLedBrightnessFile = fopen(brightness_file_name, "w");
         if (pLedBrightnessFile == NULL)
         {
@@ -218,22 +204,24 @@ int main()
         fclose(pLedBrightnessFile);
 
         //Declare the remaining pLedBrightnessFile# for each LED brightness file, and open them for write mode
+        //Code taken from LED Guide
         FILE *pLedBrightnessFile1 = fopen(brightness_file_name1, "w");
         FILE *pLedBrightnessFile2 = fopen(brightness_file_name2, "w");
         FILE *pLedBrightnessFile3 = fopen(brightness_file_name3, "w");
-
         //Declare the remaining charWritten_bright# for each LED brightness file
         int charWritten_bright1 = 0; 
         int charWritten_bright2 = 0;
         int charWritten_bright3 = 0;
 
-        printf("LED0 on!\nWhen LED3 lights up, press the USER button!\n");
+        printf("When LED3 lights up, press the USER button!\n");
         sleepForMs(2000); //wait for 2ms
 
-        //Check if user is already pressing the USER button
         int response_time = 0;
+        //Check if user is already pressing the USER button
+        //Code taken from GPIO Guide
         int user_value_after_wait = readFromFileToScreen("/sys/class/gpio/gpio72/value");
         if (user_value_after_wait == 0){
+            //If user has not pressed the USER button after 5 seconds, display response time and exit game
             response_time = 5000;
             printf("Your response time is: %i ms\n",response_time);
             play_game = 0;
@@ -241,6 +229,7 @@ int main()
         else{
             //Light up LED3
             //Set the brightness of LED 3 to ON
+            //Code to set brightness taken from LED Guide
             if (pLedBrightnessFile3 == NULL)
             {
                 printf("ERROR OPENING %s.", brightness_file_name3);
@@ -258,7 +247,6 @@ int main()
             long long current_time = 0;
             long long time_difference = 0;
             long long temp_best_time = 0;
-            //long long temp_time_difference = 0;
 
             int user_value_after_led3 = 1;
             bool user_pressed_after_led3 = false;
@@ -267,13 +255,12 @@ int main()
             {
                 current_time = getTimeInMs();
                 time_difference = current_time - start_timer;
-                
-               
-                
+                     
                 user_value_after_led3 = readFromFileToScreen("/sys/class/gpio/gpio72/value");
                 if(user_value_after_led3 == 0 && time_difference < 5000){
                 
                     //Light up all LEDS
+                    //Code to set brightness taken from LED Guide
                     //Set the brightness of LED 1 to ON
                     if (pLedBrightnessFile1 == NULL)
                     {
@@ -298,7 +285,7 @@ int main()
                         exit(1);
                     }
                     fclose(pLedBrightnessFile2);
-                    //Check if current response time is teh best response time so far
+                    //Check if current response time is the best response time so far
                     temp_best_time = time_difference;
                     if (temp_best_time > best_time && best_time == 0)
                     {
@@ -312,11 +299,11 @@ int main()
                     //Print out reaction time and best time
                     printf("Your reaction time was: %lli ms\n",time_difference);
                     printf("Best time so far in game is: %lli ms\n",best_time);
+                    printf("Press the USER button to play again!\n");
 
                     user_pressed_after_led3 = true; //exit while loop once user has pressed USER button
                     user_pressed_start = false;
                     sleepForMs(1000);
-                    // user_pressed_start = true;
                     
                 }
                 else if (time_difference >= 5000){
@@ -331,6 +318,7 @@ int main()
         }
 
         //Turn off all LEDS
+        //Code to turn off LEDs taken from LED Guide
         //Turn off brightness for LED0
         pLedBrightnessFile = fopen(brightness_file_name, "w");
         if (pLedBrightnessFile == NULL)
@@ -386,20 +374,8 @@ int main()
     }
     
     
-    
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-    //CLose trigger files
+    //Close trigger files
+    //Code taken from LED Guide
     fclose(pLedTriggerFile);
     fclose(pLedTriggerFile1);
     fclose(pLedTriggerFile2);
