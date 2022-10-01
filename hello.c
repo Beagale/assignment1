@@ -79,8 +79,7 @@ int readFromFileToScreen(char *fileName)
     char buff[MAX_LENGTH];
     fgets(buff, MAX_LENGTH, pFile);
     // Close
-    fclose(pFile);
-    
+    fclose(pFile);  
     //line below helps to check what value is read
     //printf("Read: '%s'\n", buff);
 
@@ -165,6 +164,62 @@ int main()
     //CLose file using fclose();
     fclose(pFile); 
 
+
+    //Turn off all LEDs by default at the beginning of the program
+    //Code to write to LED's brightness file taken from LED Guide
+    //Turn off LED 0
+    FILE *pLedBrightnessFile = fopen(brightness_file_name, "w");
+    if (pLedBrightnessFile == NULL)
+    {
+        printf("ERROR OPENING %s.", brightness_file_name);
+        exit(1);
+    }
+    int charWritten_bright = fprintf(pLedBrightnessFile, "0");
+    if (charWritten_bright <= 0){
+        printf("ERROR WRITING DATA");
+        exit(1);
+    }
+    fclose(pLedBrightnessFile);
+    //Turn off LED 1
+    FILE *pLedBrightnessFile1 = fopen(brightness_file_name1, "w");
+    if (pLedBrightnessFile1 == NULL)
+    {
+        printf("ERROR OPENING %s.", brightness_file_name1);
+        exit(1);
+    }
+    int charWritten_bright1 = fprintf(pLedBrightnessFile1, "0");
+    if (charWritten_bright1 <= 0){
+        printf("ERROR WRITING DATA");
+        exit(1);
+    }
+    fclose(pLedBrightnessFile1);
+    //Turn off LED 2
+    FILE *pLedBrightnessFile2 = fopen(brightness_file_name2, "w");
+    if (pLedBrightnessFile2 == NULL)
+    {
+        printf("ERROR OPENING %s.", brightness_file_name2);
+        exit(1);
+    }
+    int charWritten_bright2 = fprintf(pLedBrightnessFile2, "0");
+    if (charWritten_bright2 <= 0){
+        printf("ERROR WRITING DATA");
+        exit(1);
+    }
+    fclose(pLedBrightnessFile2);
+    //Turn off LED 3
+    FILE *pLedBrightnessFile3 = fopen(brightness_file_name3, "w");
+    if (pLedBrightnessFile3 == NULL)
+    {
+        printf("ERROR OPENING %s.", brightness_file_name3);
+        exit(1);
+    }
+    int charWritten_bright3 = fprintf(pLedBrightnessFile3, "0");
+    if (charWritten_bright3 <= 0){
+        printf("ERROR WRITING DATA");
+        exit(1);
+    }
+    fclose(pLedBrightnessFile3);
+
     int user_value_start = 1; //Set flag that states the current number in gpio72 value file
     bool user_pressed_start = false; //Set flag that states that user has not pressed USER button
     long long best_time = 0;
@@ -189,29 +244,18 @@ int main()
         }
 
         //Set the brightness of LED 0 to ON
-        //Code to set brightness taken from LED Guide
-        FILE *pLedBrightnessFile = fopen(brightness_file_name, "w");
+        pLedBrightnessFile = fopen(brightness_file_name, "w");
         if (pLedBrightnessFile == NULL)
         {
             printf("ERROR OPENING %s.", brightness_file_name);
             exit(1);
         }
-        int charWritten_bright = fprintf(pLedBrightnessFile, "1");
+        charWritten_bright = fprintf(pLedBrightnessFile, "1");
         if (charWritten_bright <= 0){
             printf("ERROR WRITING DATA");
             exit(1);
         }
         fclose(pLedBrightnessFile);
-
-        //Declare the remaining pLedBrightnessFile# for each LED brightness file, and open them for write mode
-        //Code taken from LED Guide
-        FILE *pLedBrightnessFile1 = fopen(brightness_file_name1, "w");
-        FILE *pLedBrightnessFile2 = fopen(brightness_file_name2, "w");
-        FILE *pLedBrightnessFile3 = fopen(brightness_file_name3, "w");
-        //Declare the remaining charWritten_bright# for each LED brightness file
-        int charWritten_bright1 = 0; 
-        int charWritten_bright2 = 0;
-        int charWritten_bright3 = 0;
 
         printf("When LED3 lights up, press the USER button!\n");
         sleepForMs(2000); //wait for 2ms
@@ -223,121 +267,111 @@ int main()
         if (user_value_after_wait == 0){
             //If user has not pressed the USER button after 5 seconds, display response time and exit game
             response_time = 5000;
-            //printf("Your response time is: %i ms\n",response_time);
-            //play_game = 0;
+
         }
-       // else{
-            //Light up LED3
-            //Set the brightness of LED 3 to ON
-            //Code to set brightness taken from LED Guide
-            if (pLedBrightnessFile3 == NULL)
-            {
-                printf("ERROR OPENING %s.", brightness_file_name3);
-                exit(1);
-            }
-            charWritten_bright3 = fprintf(pLedBrightnessFile3, "1");
-            if (charWritten_bright3 <= 0){
-                printf("ERROR WRITING DATA");
-                exit(1);
-            }
-            fclose(pLedBrightnessFile3);
+      
+        pLedBrightnessFile3 = fopen(brightness_file_name3, "w");
+        if (pLedBrightnessFile3 == NULL)
+        {
+            printf("ERROR OPENING %s.", brightness_file_name3);
+            exit(1);
+        }
+        charWritten_bright3 = fprintf(pLedBrightnessFile3, "1");
+        if (charWritten_bright3 <= 0){
+            printf("ERROR WRITING DATA");
+            exit(1);
+        }
+        fclose(pLedBrightnessFile3);
            
-            //Start timer
-            long long start_timer = getTimeInMs();
-            long long current_time = 0;
-            long long time_difference = 0;
-            long long temp_best_time = 0;
-            //long long temp_best_time_5000 = 0;
+        //Start timer
+        long long start_timer = getTimeInMs();
+        long long current_time = 0;
+        long long time_difference = 0;
+        long long temp_best_time = 0;
 
-            int user_value_after_led3 = 1;
-            bool user_pressed_after_led3 = false;
+        int user_value_after_led3 = 1;
+        bool user_pressed_after_led3 = false;
+        
+        while (user_pressed_after_led3 == false)
+        {
+            current_time = getTimeInMs();
+            time_difference = current_time - start_timer;
+                    
+            user_value_after_led3 = readFromFileToScreen("/sys/class/gpio/gpio72/value");
+            if(user_value_after_led3 == 0 && time_difference < 5000){
             
-            while (user_pressed_after_led3 == false)
-            {
-                current_time = getTimeInMs();
-                time_difference = current_time - start_timer;
-                     
-                user_value_after_led3 = readFromFileToScreen("/sys/class/gpio/gpio72/value");
-                if(user_value_after_led3 == 0 && time_difference < 5000){
+                //Light up all LEDS
+                //Set the brightness of LED 1 to ON
+                pLedBrightnessFile1 = fopen(brightness_file_name1, "w");
+                if (pLedBrightnessFile1 == NULL)
+                {
+                    printf("ERROR OPENING %s.", brightness_file_name1);
+                    exit(1);
+                }
+                charWritten_bright1 = fprintf(pLedBrightnessFile1, "1");
+                if (charWritten_bright1 <= 0){
+                    printf("ERROR WRITING DATA");
+                    exit(1);
+                }
+                fclose(pLedBrightnessFile1);
+                //Set the brightness of LED 2 to ON
+                pLedBrightnessFile2 = fopen(brightness_file_name2, "w");
+                if (pLedBrightnessFile2 == NULL)
+                {
+                    printf("ERROR OPENING %s.", brightness_file_name2);
+                    exit(1);
+                }
+                charWritten_bright2 = fprintf(pLedBrightnessFile2, "1");
+                if (charWritten_bright2 <= 0){
+                    printf("ERROR WRITING DATA");
+                    exit(1);
+                }
+                fclose(pLedBrightnessFile2);
+
                 
-                    //Light up all LEDS
-                    //Code to set brightness taken from LED Guide
-                    //Set the brightness of LED 1 to ON
-                    if (pLedBrightnessFile1 == NULL)
-                    {
-                        printf("ERROR OPENING %s.", brightness_file_name1);
-                        exit(1);
-                    }
-                    charWritten_bright1 = fprintf(pLedBrightnessFile1, "1");
-                    if (charWritten_bright1 <= 0){
-                        printf("ERROR WRITING DATA");
-                        exit(1);
-                    }
-                    fclose(pLedBrightnessFile1);
-                    //Set the brightness of LED 2 to ON
-                    if (pLedBrightnessFile2 == NULL)
-                    {
-                        printf("ERROR OPENING %s.", brightness_file_name2);
-                        exit(1);
-                    }
-                    charWritten_bright2 = fprintf(pLedBrightnessFile2, "1");
-                    if (charWritten_bright2 <= 0){
-                        printf("ERROR WRITING DATA");
-                        exit(1);
-                    }
-                    fclose(pLedBrightnessFile2);
 
-                    
-
-                    //Check if current response time is the best response time so far
-                   // temp_best_time_5000 = temp_best_time;
-                    temp_best_time = time_difference;
-                   
-                    if (temp_best_time > best_time && best_time == 0)
-                    {
-                        best_time = temp_best_time;
-                        printf("New best time!\n");
-                    }
-                    else if (temp_best_time < best_time && temp_best_time != 0){
-                        best_time = temp_best_time;
-                    }
-
-                   if (response_time == 5000)  {
-                    //TEST
-                    //printf("entered response time if statement\n\ntemp_best_time = %lli",temp_best_time_5000);
-
-                        //best_time = temp_best_time_5000;
-                        printf("Your reaction time was: %lli ms\n",response_time);
-                        printf("Best time so far in game is: %lli ms\n",best_time);
-                        printf("Press the USER button to play again!\n");
-                   
-                    }
-                    else{ 
-
-                        //Print out reaction time and best time
-                        printf("Your reaction time was: %lli ms\n",time_difference);
-                        printf("Best time so far in game is: %lli ms\n",best_time);
-                        printf("Press the USER button to play again!\n");
-                    }
-                    
-                    user_pressed_after_led3 = true; //exit while loop once user has pressed USER button
-                    user_pressed_start = false;
-                    sleepForMs(1000);
-                    
+                //Check if current response time is the best response time so far
+                temp_best_time = time_difference;
+                
+                if (temp_best_time > best_time && best_time == 0)
+                {
+                    best_time = temp_best_time;
+                    printf("New best time!\n");
                 }
-                else if (time_difference >= 5000){
-                    printf("No input within 5000ms; quitting!\n");
-                    user_pressed_after_led3 = true;
-                    play_game = 0;
+                else if (temp_best_time < best_time && temp_best_time != 0){
+                    best_time = temp_best_time;
+                }
+
+                if (response_time == 5000)  {
+                    //best_time = temp_best_time_5000;
+                    printf("Your reaction time was: %lli ms\n",response_time);
+                    printf("Best time so far in game is: %lli ms\n",best_time);
+                    printf("Press the USER button to play again!\n");
+                
+                }
+                else{
+                    //Print out reaction time and best time
+                    printf("Your reaction time was: %lli ms\n",time_difference);
+                    printf("Best time so far in game is: %lli ms\n",best_time);
+                    printf("Press the USER button to play again!\n");
 
                 }
+                
+                user_pressed_after_led3 = true; //exit while loop once user has pressed USER button
+                user_pressed_start = false;
+                sleepForMs(1000);
+                
             }
+            else if (time_difference >= 5000){
+                printf("No input within 5000ms; quitting!\n");
+                user_pressed_after_led3 = true;
+                play_game = 0;
 
+            }
+        }
 
-//        }
 
         //Turn off all LEDS
-        //Code to turn off LEDs taken from LED Guide
         //Turn off brightness for LED0
         pLedBrightnessFile = fopen(brightness_file_name, "w");
         if (pLedBrightnessFile == NULL)
@@ -394,7 +428,7 @@ int main()
     
     
     //Close trigger files
-    //Code taken from LED Guide
+    //Code taken from GPIO Guide
     fclose(pLedTriggerFile);
     fclose(pLedTriggerFile1);
     fclose(pLedTriggerFile2);
