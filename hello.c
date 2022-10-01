@@ -17,7 +17,7 @@
 
 static long long getTimeInMs(void);
 static void sleepForMs(long long);
-int readFromFileToScreen(char *); 
+static int readFromFileToScreen(char *); 
 static void runCommand(char *);
 
 //Functions shown below before main() are taken/referenced from Assignment 1 PDF (unless indicated)
@@ -32,6 +32,7 @@ static long long getTimeInMs(void)
     + nanoSeconds / 1000000;
     return milliSeconds;
 }
+
 //Code to wait a number of milliseconds
 static void sleepForMs(long long delayInMs)
 {
@@ -43,6 +44,7 @@ static void sleepForMs(long long delayInMs)
     struct timespec reqDelay = {seconds, nanoseconds};
     nanosleep(&reqDelay, (struct timespec *) NULL);
 }
+
 //Code to run a Linux command within C program
 static void runCommand(char* command)
 {
@@ -65,8 +67,8 @@ static void runCommand(char* command)
     }
 }
 
-//Code taken from GPIO Guide 
 //Reads data from a file
+//Code taken from GPIO Guide 
 int readFromFileToScreen(char *fileName)
 {
     FILE *pFile = fopen(fileName, "r");
@@ -228,10 +230,8 @@ int main()
     int play_game = 1;
     while(play_game == 1)
     {
-
         while (user_pressed_start == false)
         {
-        
             user_value_start = readFromFileToScreen("/sys/class/gpio/gpio72/value"); //Read gpio72 value file to see if user has pressed button
             if(user_value_start == 0){
             
@@ -262,7 +262,6 @@ int main()
 
         long long response_time = 0;
         //Check if user is already pressing the USER button
-        //Code taken from GPIO Guide
         int user_value_after_wait = readFromFileToScreen("/sys/class/gpio/gpio72/value");
         if (user_value_after_wait == 0){
             //If user has not pressed the USER button after 5 seconds, display response time and exit game
@@ -270,6 +269,7 @@ int main()
 
         }
       
+        //Set the brightness of LED1 to ON
         pLedBrightnessFile3 = fopen(brightness_file_name3, "w");
         if (pLedBrightnessFile3 == NULL)
         {
@@ -328,11 +328,9 @@ int main()
                 }
                 fclose(pLedBrightnessFile2);
 
-                
+                temp_best_time = time_difference;
 
                 //Check if current response time is the best response time so far
-                temp_best_time = time_difference;
-                
                 if (temp_best_time > best_time && best_time == 0)
                 {
                     best_time = temp_best_time;
@@ -343,23 +341,35 @@ int main()
                 }
 
                 if (response_time == 5000)  {
-                    //best_time = temp_best_time_5000;
                     printf("Your reaction time was: %lli ms\n",response_time);
                     printf("Best time so far in game is: %lli ms\n",best_time);
-                    printf("Press the USER button to play again!\n");
+                   //TEST!
+                   //Check to see if user is still holding USER button even after reaction and best times are printed
+                   bool user_still_pressing_button = true;
+                   while(user_still_pressing_button == true)
+                   {
+                        int value_in_file = 0;
+                        if(value_in_file == readFromFileToScreen("/sys/class/gpio/gpio72/value")){
+                            user_still_pressing_button = true;
+                        }
+                        else{
+                            user_still_pressing_button = false;
+                        }
+                   }
+                   //END TEST
                 
                 }
                 else{
-                    //Print out reaction time and best time
                     printf("Your reaction time was: %lli ms\n",time_difference);
                     printf("Best time so far in game is: %lli ms\n",best_time);
-                    printf("Press the USER button to play again!\n");
+                  //  printf("Press the USER button to play again!\n");
 
                 }
                 
                 user_pressed_after_led3 = true; //exit while loop once user has pressed USER button
                 user_pressed_start = false;
-                sleepForMs(1000);
+                sleepForMs(1000); //wait for 1ms
+                printf("Press the USER button to play again!\n");
                 
             }
             else if (time_difference >= 5000){
