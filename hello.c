@@ -20,6 +20,41 @@ static void sleepForMs(long long);
 static int readFromFileToScreen(char *); 
 static void runCommand(char *);
 
+//TEST
+static void function_to_open_bright_file(char *, char *);
+static void function_to_open_trigger_file(char *,char *);
+
+static void function_to_open_trigger_file(char *file_name,char *word)
+{
+    FILE *pLedTriggerFile = fopen(file_name,"w");
+    if(pLedTriggerFile == NULL){
+        printf("ERROR OPENING %s.",file_name);
+        exit(1);
+    }
+    int charWritten = fprintf(pLedTriggerFile, word);
+    if(charWritten <= 0){
+        printf("ERROR WRITING DATA");
+        exit(1);
+    }
+    fclose(pLedTriggerFile);
+}
+
+static void function_to_open_bright_file(char *file_name, char *number)
+{
+    FILE *pLedBrightnessFile = fopen(file_name, "w");
+    if (pLedBrightnessFile == NULL)
+    {
+        printf("ERROR OPENING %s.", file_name);
+        exit(1);
+    }
+    int charWritten_bright = fprintf(pLedBrightnessFile, number);
+    if (charWritten_bright <= 0){
+        printf("ERROR WRITING DATA");
+        exit(1);
+    }
+    fclose(pLedBrightnessFile);
+}
+
 //Functions shown below before main() are taken/referenced from Assignment 1 PDF (unless indicated)
 //Retrieve the current time
 static long long getTimeInMs(void)
@@ -105,10 +140,18 @@ int main()
 
     printf("Hello embedded world, from Abigail!\nClick the USER button to start the game!\n");
 
+    //function_to_open_bright_file(brightness_file_name,"1");
+
     //Set all LEDs' triggers
     //Code to set triggers is taken from LED Guide
+    //TEST
+    function_to_open_trigger_file(trigger_file_name,"none");
+    function_to_open_trigger_file(trigger_file_name1,"none");
+    function_to_open_trigger_file(trigger_file_name2,"none");
+    function_to_open_trigger_file(trigger_file_name3,"none");
+
     //Set trigger for LED0
-    FILE *pLedTriggerFile = fopen(trigger_file_name,"w");
+  /*  FILE *pLedTriggerFile = fopen(trigger_file_name,"w");
     if(pLedTriggerFile == NULL){
         printf("ERROR OPENING %s.",trigger_file_name);
         exit(1);
@@ -151,6 +194,7 @@ int main()
         printf("ERROR WRITING DATA");
         exit(1);
     }
+*/
 
     //Config USER button for gpio
     //Code taken from GPIO guide
@@ -169,6 +213,12 @@ int main()
 
     //Turn off all LEDs by default at the beginning of the program
     //Code to write to LED's brightness file taken from LED Guide
+    //TEST
+    function_to_open_bright_file(brightness_file_name,"0");
+    function_to_open_bright_file(brightness_file_name1,"0");
+    function_to_open_bright_file(brightness_file_name2,"0");
+    function_to_open_bright_file(brightness_file_name3,"0");
+    /*
     //Turn off LED 0
     FILE *pLedBrightnessFile = fopen(brightness_file_name, "w");
     if (pLedBrightnessFile == NULL)
@@ -221,6 +271,7 @@ int main()
         exit(1);
     }
     fclose(pLedBrightnessFile3);
+    */
 
     int user_value_start = 1; //Set flag that states the current number in gpio72 value file
     bool user_pressed_start = false; //Set flag that states that user has not pressed USER button
@@ -244,6 +295,9 @@ int main()
         }
 
         //Set the brightness of LED 0 to ON
+        //TEST
+        function_to_open_bright_file(brightness_file_name,"1");
+        /*
         pLedBrightnessFile = fopen(brightness_file_name, "w");
         if (pLedBrightnessFile == NULL)
         {
@@ -256,6 +310,7 @@ int main()
             exit(1);
         }
         fclose(pLedBrightnessFile);
+        */
 
         printf("When LED3 lights up, press the USER button!\n");
         sleepForMs(2000); //wait for 2ms
@@ -269,7 +324,10 @@ int main()
 
         }
       
-        //Set the brightness of LED1 to ON
+        //Set the brightness of LED3 to ON
+        //TEST
+        function_to_open_bright_file(brightness_file_name3,"1");
+    /*
         pLedBrightnessFile3 = fopen(brightness_file_name3, "w");
         if (pLedBrightnessFile3 == NULL)
         {
@@ -282,6 +340,7 @@ int main()
             exit(1);
         }
         fclose(pLedBrightnessFile3);
+    */
            
         //Start timer
         long long start_timer = getTimeInMs();
@@ -302,6 +361,9 @@ int main()
             
                 //Light up all LEDS
                 //Set the brightness of LED 1 to ON
+                //TEST
+                function_to_open_bright_file(brightness_file_name1,"1");
+            /*
                 pLedBrightnessFile1 = fopen(brightness_file_name1, "w");
                 if (pLedBrightnessFile1 == NULL)
                 {
@@ -314,7 +376,11 @@ int main()
                     exit(1);
                 }
                 fclose(pLedBrightnessFile1);
+            */
                 //Set the brightness of LED 2 to ON
+                //TEST
+                function_to_open_bright_file(brightness_file_name2,"1");
+            /*
                 pLedBrightnessFile2 = fopen(brightness_file_name2, "w");
                 if (pLedBrightnessFile2 == NULL)
                 {
@@ -327,7 +393,7 @@ int main()
                     exit(1);
                 }
                 fclose(pLedBrightnessFile2);
-
+            */
                 temp_best_time = time_difference;
 
                 //Check if current response time is the best response time so far
@@ -383,6 +449,12 @@ int main()
 
         //Turn off all LEDS
         //Turn off brightness for LED0
+        //TEST
+        function_to_open_bright_file(brightness_file_name,"0");
+        function_to_open_bright_file(brightness_file_name1,"0");
+        function_to_open_bright_file(brightness_file_name2,"0");
+        function_to_open_bright_file(brightness_file_name3,"0");
+        /*
         pLedBrightnessFile = fopen(brightness_file_name, "w");
         if (pLedBrightnessFile == NULL)
         {
@@ -434,16 +506,18 @@ int main()
             exit(1);
         }
         fclose(pLedBrightnessFile3);
+        */
     }
     
     
     //Close trigger files
     //Code taken from GPIO Guide
+    /*
     fclose(pLedTriggerFile);
     fclose(pLedTriggerFile1);
     fclose(pLedTriggerFile2);
     fclose(pLedTriggerFile3);
-    
+    */
     
     
     return 0;
