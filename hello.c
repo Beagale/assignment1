@@ -236,7 +236,7 @@ int main()
                 }
                 else if (temp_best_time < best_time && temp_best_time != 0){
                     best_time = temp_best_time;
-                     printf("New best time!\n");
+                    printf("New best time!\n");
                 }
                 
                 if (response_time == 5000)  {
